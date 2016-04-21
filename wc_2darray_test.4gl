@@ -6,7 +6,7 @@ DEFINE twodarray STRING
 DEFINE pos, x, y INTEGER
 
     WHILE TRUE
-        MENU "" 
+        MENU "2d Array Test" 
             ON ACTION timestable ATTRIBUTES(TEXT="Times Table")
                 CALL populate_timestable()
                 EXIT MENU
