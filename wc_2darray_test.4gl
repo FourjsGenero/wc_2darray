@@ -3,6 +3,7 @@ IMPORT util
 
 MAIN
 DEFINE twodarray STRING
+DEFINE l_result STRING
 
     WHILE TRUE
         MENU "2d Array Test" 
@@ -25,7 +26,8 @@ DEFINE twodarray STRING
                 EXIT WHILE
         END MENU
         OPEN WINDOW w WITH FORM "wc_2darray_test.per"
-        CALL wc_2darray.html_send("formonly.twodarray")    
+        CALL wc_2darray.html_send("formonly.twodarray") 
+  
         INPUT BY NAME twodarray ATTRIBUTES(WITHOUT DEFAULTS=TRUE, UNBUFFERED)
             ON ACTION select ATTRIBUTES(DEFAULTVIEW=NO)
                 CALL FGL_WINMESSAGE("Info",twodarray,"")
@@ -37,22 +39,27 @@ END MAIN
 FUNCTION populate_timestable()
 DEFINE x,y INTEGER
 
+
     CALL wc_2darray.init()
+
+    CALL wc_2darray.style_append(".numeric","text-align","right");
+
     -- Define column headers
     FOR x = 1 TO 10
         CALL wc_2darray.col_set(x,x)
-        CALL wc_2darray.col_style_set(x,"text-align:right; width:40px")
+        CALL wc_2darray.col_class_set(x,"numeric")
+        CALL wc_2darray.col_style_set(x,"width:40px")
     END FOR
     -- Define row headers
     FOR y = 1 TO 10
         CALL wc_2darray.row_set(y,y)
-        CALL wc_2darray.row_style_set(y,"text-align:right")
+        CALL wc_2darray.row_class_set(y,"numeric")
     END FOR
     -- Define individual cells
     FOR x = 1 TO 10
         FOR y = 1 TO 10
             CALL wc_2darray.cell_set(x,y,x*y)
-            CALL wc_2darray.cell_style_set(x,y,"text-align:right")
+            CALL wc_2darray.cell_class_set(x,y,"numeric")
         END FOR
     END FOR
 END FUNCTION
@@ -61,19 +68,30 @@ FUNCTION populate_coloursize()
 DEFINE x, y INTEGER
 
     CALL wc_2darray.init()
-
+    CALL wc_2darray.style_append(".numeric","text-align","right");
+    CALL wc_2darray.style_append(".col_header","width","60px")
+    CALL wc_2darray.style_append(".col_header","font-size","1.25em")
+    CALL wc_2darray.style_append(".col_header","color","white")
+    CALL wc_2darray.style_append(".row_header","width","60px")
+    CALL wc_2darray.style_append(".row_header","font-size","1.25em")
+    CALL wc_2darray.style_append(".row_header","background-color","black")
+    CALL wc_2darray.style_append(".row_header","color","white")
+    
     -- Define column headers
     CALL wc_2darray.col_set(1,"Red")
-    CALL wc_2darray.col_style_set(1,"text-align:right; width:60px; background-color: red; color:white; font-size:1.25em")
     CALL wc_2darray.col_set(2,"Green")
-    CALL wc_2darray.col_style_set(2,"text-align:right; width:60px; background-color: green; color:white; font-size:1.25em")
     CALL wc_2darray.col_set(3,"Blue")
-    CALL wc_2darray.col_style_set(3,"text-align:right; width:60px; background-color: blue; color:white; font-size:1.25em")
+    CALL wc_2darray.col_class_set(1,"col_header numeric")
+    CALL wc_2darray.col_class_set(2,"col_header numeric")
+    CALL wc_2darray.col_class_set(3,"col_header numeric")
+    CALL wc_2darray.col_style_set(1,"background-color: red;")
+    CALL wc_2darray.col_style_set(2,"background-color: green;")
+    CALL wc_2darray.col_style_set(3,"background-color: blue;")
 
     -- Define row headers
     FOR y = 1 TO 12
         CALL wc_2darray.row_set(y,y+3)
-        CALL wc_2darray.row_style_set(y,"text-align:right; width:60px; background-color: black; color:white; font-size:1.25em")
+        CALL wc_2darray.row_class_set(y,"row_header numeric")
     END FOR
 
     -- Define cells, would normally retrieve these from a database with a FETCH per cell e.g.
@@ -82,7 +100,7 @@ DEFINE x, y INTEGER
     FOR x = 1 TO 3
         FOR y = 1 TO 12
             CALL wc_2darray.cell_set(x,y,util.Math.rand(100))
-            CALL wc_2darray.cell_style_set(x,y,"text-align:right")
+            CALL wc_2darray.cell_class_set(x,y,"numeric")
         END FOR
     END FOR
 END FUNCTION
@@ -138,6 +156,9 @@ DEFINE l_a, l_b, l_v DECIMAL(11,2)
 DEFINE l_acct CHAR(5)
 
     CALL wc_2darray.init()
+    CALL wc_2darray.style_append(".numeric","text-align","right")
+    CALL wc_2darray.style_append(".merged","text-align","center")
+    CALL wc_2darray.style_append(".heading","font-weight","bold")
 
     -- Define columns
     CALL wc_2darray.col_set("1", "")
@@ -164,27 +185,28 @@ DEFINE l_acct CHAR(5)
     -- Define grouped column headers
     CALL wc_2darray.cell_set(1,1, "Account Code")
     CALL wc_2darray.cell_height_set(1,1,2)
+    CALL wc_2darray.cell_class_set(1,1,"heading")
 
     CALL wc_2darray.cell_set(2,1,"Last Year")
     CALL wc_2darray.cell_width_set(2,1,3)
-    CALL wc_2darray.cell_style_set(2,1,"text-align:center")
+    CALL wc_2darray.cell_class_set(2,1,"heading merged")
 
     CALL wc_2darray.cell_set(5,1,"This Year")
     CALL wc_2darray.cell_width_set(5,1,3)
-    CALL wc_2darray.cell_style_set(5,1,"text-align:center")
+    CALL wc_2darray.cell_class_set(5,1,"heading merged")
 
     CALL wc_2darray.cell_set(2,2,"Budget")
-    CALL wc_2darray.cell_style_set(2,2,"text-align:right")
+    CALL wc_2darray.cell_class_set(2,2,"heading numeric")
     CALL wc_2darray.cell_set(3,2,"Actual")
-    CALL wc_2darray.cell_style_set(3,2,"text-align:right")
+    CALL wc_2darray.cell_style_set(3,2,"heading numeric")
     CALL wc_2darray.cell_set(4,2,"Variance")
-    CALL wc_2darray.cell_style_set(4,2,"text-align:right")
+    CALL wc_2darray.cell_style_set(4,2,"heading numeric")
     CALL wc_2darray.cell_set(5,2,"Budget")
-    CALL wc_2darray.cell_style_set(5,2,"text-align:right")
+    CALL wc_2darray.cell_style_set(5,2,"heading numeric")
     CALL wc_2darray.cell_set(6,2,"Actual")
-    CALL wc_2darray.cell_style_set(6,2,"text-align:right")
+    CALL wc_2darray.cell_style_set(6,2,"heading numeric")
     CALL wc_2darray.cell_set(7,2,"Variance")
-    CALL wc_2darray.cell_style_set(7,2,"text-align:right")
+    CALL wc_2darray.cell_style_set(7,2,"heading numeric")
 
     -- Define cell contents
     FOR y = 3 TO 50
@@ -490,4 +512,6 @@ DEFINE l_pld, l_pts, l_gd INTEGER
     CALL wc_2darray.cell_height_set(11,18,3)
     CALL wc_2darray.cell_set(11,18,"Relegation to the Football League Championship")
     CALL wc_2darray.cell_style_set(11,18,"background-color: #FFABAC")
+
 END FUNCTION
+
