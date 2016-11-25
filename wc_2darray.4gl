@@ -217,7 +217,7 @@ DEFINE l_exclude BOOLEAN
         END FOR
     END FOR
     CALL sb.append("</table>")
-    DISPLAY sb.toString()
+    #DISPLAY sb.toString()
     RETURN sb.toString()
 END FUNCTION
 
@@ -235,7 +235,7 @@ DEFINE i, j INTEGER
         END FOR
         CALL sb.append("} ")
     END FOR
-    DISPLAY sb.toString()
+    #DISPLAY sb.toString()
     RETURN sb.toString()
 END FUNCTION
 

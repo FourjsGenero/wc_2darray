@@ -5,6 +5,7 @@ MAIN
 DEFINE twodarray STRING
 DEFINE l_result STRING
 
+    OPEN WINDOW w WITH FORM "wc_2darray_test.per"
     WHILE TRUE
         MENU "2d Array Test"  
             ON ACTION timestable ATTRIBUTES(TEXT="Times Table")
@@ -34,15 +35,18 @@ DEFINE l_result STRING
             ON ACTION close
                 EXIT WHILE
         END MENU
-        OPEN WINDOW w WITH FORM "wc_2darray_test.per"
+        
         CALL wc_2darray.html_send("formonly.twodarray") 
   
         INPUT BY NAME twodarray ATTRIBUTES(WITHOUT DEFAULTS=TRUE, UNBUFFERED)
             ON ACTION select ATTRIBUTES(DEFAULTVIEW=NO)
                 CALL FGL_WINMESSAGE("Info",twodarray,"")
         END INPUT
-        #EXIT WHILE  -- TODO remove
-        CLOSE WINDOW w
+        LET int_flag = 0
+        
+        CALL wc_2darray.init()
+        CALL wc_2darray.html_send("formonly.twodarray") 
+        
     END WHILE
 END MAIN
 
