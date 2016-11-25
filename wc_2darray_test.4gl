@@ -6,21 +6,30 @@ DEFINE twodarray STRING
 DEFINE l_result STRING
 
     WHILE TRUE
-        MENU "2d Array Test" 
+        MENU "2d Array Test"  
             ON ACTION timestable ATTRIBUTES(TEXT="Times Table")
                 CALL populate_timestable()
                 EXIT MENU
             ON ACTION coloursize ATTRIBUTES(TEXT="Colour Size")
                 CALL populate_coloursize()
                 EXIT MENU
+            ON ACTION coloursize2 ATTRIBUTES(TEXT="Colour Size 2")
+                CALL populate_coloursize2()
+                EXIT MENU
             ON ACTION calendar ATTRIBUTES(TEXT="Calendar")
                 CALL populate_calendar()
+                EXIT MENU
+            ON ACTION timeline ATTRIBUTES(TEXT="Timeline")
+                CALL populate_timeline()
                 EXIT MENU
             ON ACTION accounting ATTRIBUTES(TEXT="Accounting")
                 CALL populate_accounting()
                 EXIT MENU
             ON ACTION premiership ATTRIBUTES(TEXT="Premiership")
                 CALL populate_premiership()
+                EXIT MENU
+            ON ACTION multiple_aggregate ATTRIBUTES(TEXT="Multiple Aggregates")
+                CALL populate_multiple_aggregate()
                 EXIT MENU
             ON ACTION close
                 EXIT WHILE
@@ -32,6 +41,7 @@ DEFINE l_result STRING
             ON ACTION select ATTRIBUTES(DEFAULTVIEW=NO)
                 CALL FGL_WINMESSAGE("Info",twodarray,"")
         END INPUT
+        #EXIT WHILE  -- TODO remove
         CLOSE WINDOW w
     END WHILE
 END MAIN
@@ -105,6 +115,56 @@ DEFINE x, y INTEGER
     END FOR
 END FUNCTION
 
+FUNCTION populate_coloursize2()
+DEFINE x, y INTEGER
+
+    CALL wc_2darray.init()
+    CALL wc_2darray.style_append(".numeric","text-align","right");
+    CALL wc_2darray.style_append(".col_header","width","60px")
+    CALL wc_2darray.style_append(".col_header","font-size","1.25em")
+    CALL wc_2darray.style_append(".col_header","color","white")
+    CALL wc_2darray.style_append(".row_header","width","60px")
+    CALL wc_2darray.style_append(".row_header","font-size","1.25em")
+    CALL wc_2darray.style_append(".row_header","background-color","black")
+    CALL wc_2darray.style_append(".row_header","color","white")
+    
+    -- Define column headers
+    CALL wc_2darray.col_set(1,"Red")
+    CALL wc_2darray.col_set(2,"Green")
+    CALL wc_2darray.col_set(3,"Blue")
+    CALL wc_2darray.col_set(4,"Magenta")
+    CALL wc_2darray.col_set(5,"Yellow")
+    CALL wc_2darray.col_set(6,"Orange")
+    CALL wc_2darray.col_class_set(1,"col_header numeric")
+    CALL wc_2darray.col_class_set(2,"col_header numeric")
+    CALL wc_2darray.col_class_set(3,"col_header numeric")
+    CALL wc_2darray.col_class_set(4,"col_header numeric")
+    CALL wc_2darray.col_class_set(5,"col_header numeric")
+    CALL wc_2darray.col_class_set(6,"col_header numeric")
+    CALL wc_2darray.col_style_set(1,"background-color: red;")
+    CALL wc_2darray.col_style_set(2,"background-color: green;")
+    CALL wc_2darray.col_style_set(3,"background-color: blue;")
+    CALL wc_2darray.col_style_set(4,"background-color: magenta;")
+    CALL wc_2darray.col_style_set(5,"background-color: yellow; color: black;")
+    CALL wc_2darray.col_style_set(6,"background-color: orange;")
+
+    -- Define row headers
+    FOR y = 1 TO 12
+        CALL wc_2darray.row_set(y,y+3)
+        CALL wc_2darray.row_class_set(y,"row_header numeric")
+    END FOR
+
+    -- Define cells, would normally retrieve these from a database with a FETCH per cell e.g.
+    -- OPEN get_qty USING color, size
+    -- FETCH get_qty INTO qty
+    FOR x = 1 TO 6
+        FOR y = 1 TO 12
+            CALL wc_2darray.cell_set(x,y,util.Math.rand(100))
+            CALL wc_2darray.cell_class_set(x,y,"numeric")
+        END FOR
+    END FOR
+END FUNCTION
+
 FUNCTION populate_calendar()
 DEFINE x,y INTEGER
 
@@ -146,6 +206,214 @@ DEFINE x,y INTEGER
             CALL wc_2darray.cell_style_set(x,y,"background-color: #FFFFCE")
         END FOR
     END FOR
+END FUNCTION
+
+
+FUNCTION populate_timeline()
+DEFINE x,y INTEGER
+DEFINE d DATE
+DEFINE m STRING
+
+    CALL wc_2darray.init()
+
+    -- define styles once
+    CALL wc_2darray.style_append(".numeric","text-align","right")
+    CALL wc_2darray.style_append(".prompt","background-color","#FFFFDA")
+    CALL wc_2darray.style_append(".type","text-align","center")
+    CALL wc_2darray.style_append(".type","background-color","#19BA26")
+    CALL wc_2darray.style_append(".type","text-color","white")
+
+    CALL wc_2darray.style_append(".milestone","background-color","#9FD0E1")
+    CALL wc_2darray.style_append(".milestone_action","background-color","#EEEE6D")
+    CALL wc_2darray.style_append(".installment","background-color","#0AFF88")
+    CALL wc_2darray.style_append(".today","background-color","yellow")
+    
+    CALL wc_2darray.style_append(".workday","background-color","#6D6D6D")
+    CALL wc_2darray.style_append(".weekend","background-color","#D0D0D0")
+    CALL wc_2darray.style_append(".workday_alt","background-color","#E4E4E4")
+    CALL wc_2darray.style_append(".weekend_alt","background-color","#FCF7FD")
+
+    CALL wc_2darray.style_append("table","border","white solid 1px")
+    CALL wc_2darray.style_append("th","border","white solid 1px")
+    CALL wc_2darray.style_append("td","border","white solid 1px")
+
+    -- init columns
+    FOR x = 1 TO 35
+        CALL wc_2darray.col_set(x,"")
+    END FOR
+    FOR y = 1 TO 8
+        CALL wc_2darray.row_set(y,"")
+    END FOR
+
+    -- Prompts
+    CALL wc_2darray.cell_set(1,1,"# of Left Messages")
+    CALL wc_2darray.cell_class_set(1,1,"prompt")
+
+    CALL wc_2darray.cell_class_set(1,2,"prompt")
+   
+    CALL wc_2darray.cell_set(1,3,"Type")
+    CALL wc_2darray.cell_class_set(1,3,"prompt")
+    
+    CALL wc_2darray.cell_set(1,4,"Number")
+    CALL wc_2darray.cell_class_set(1,4,"prompt")
+   
+    CALL wc_2darray.cell_set(1,5,"No Broken Arr")
+    CALL wc_2darray.cell_class_set(1,5,"prompt")
+    
+    CALL wc_2darray.cell_set(1,6,"Dishonours")
+    CALL wc_2darray.cell_class_set(1,6,"prompt")
+   
+    CALL wc_2darray.cell_set(1,7,"# Times in Arrears")
+    CALL wc_2darray.cell_class_set(1,7,"prompt")
+    
+    CALL wc_2darray.cell_set(1,8,"#Instalment in Arrears")
+    CALL wc_2darray.cell_class_set(1,8,"prompt")
+
+    CALL wc_2darray.cell_set(3,1,"# of Positive Contacts Messages")
+    CALL wc_2darray.cell_class_set(3,1,"prompt")
+    CALL wc_2darray.cell_width_set(3,1,2)
+
+    CALL wc_2darray.cell_set(3,2,"Last Positive Contacts")
+    CALL wc_2darray.cell_class_set(3,2,"prompt")
+    CALL wc_2darray.cell_width_set(3,2,2)
+   
+    CALL wc_2darray.cell_set(3,5,"Last Broken")
+    CALL wc_2darray.cell_class_set(3,5,"prompt")
+    
+    CALL wc_2darray.cell_set(3,6,"Last Dishonour")
+    CALL wc_2darray.cell_class_set(3,6,"prompt")
+    
+    CALL wc_2darray.cell_set(3,7,"Last Finalised")
+    CALL wc_2darray.cell_class_set(3,7,"prompt")
+    
+    CALL wc_2darray.cell_set(3,8,"Arrears History")
+    CALL wc_2darray.cell_class_set(3,8,"prompt")
+    
+    CALL wc_2darray.cell_set(5,4,"Arrears")
+    CALL wc_2darray.cell_class_set(5,4,"prompt")
+
+    CALL wc_2darray.cell_set(5,5,"Payment")
+    CALL wc_2darray.cell_class_set(5,5,"prompt")
+
+    CALL wc_2darray.cell_set(5,6,"Instalment")
+    CALL wc_2darray.cell_class_set(5,6,"prompt")
+
+    CALL wc_2darray.cell_set(5,7,"Planned")
+    CALL wc_2darray.cell_class_set(5,7,"prompt")
+
+    CALL wc_2darray.cell_set(5,8,"Actioned")
+    CALL wc_2darray.cell_class_set(5,8,"prompt")
+
+    CALL wc_2darray.cell_set(6, 1, SFMT("%1 %2",11, "Feb"))
+    CALL wc_2darray.cell_class_set(6,1,"milestone")
+
+    FOR x = 7 TO 35
+        LET d = TODAY + (x-21)
+        CASE MONTH(d)
+            WHEN 1 LET m = "Jan"
+            WHEN 2 LET m = "Feb"
+            WHEN 3 LET m = "Mar"
+            WHEN 4 LET m = "Apr"
+            WHEN 5 LET m = "May"
+            WHEN 6 LET m = "Jun"
+            WHEN 7 LET m = "Jul"
+            WHEN 8 LET m = "Aug"
+            WHEN 9 LET m = "Sep"
+            WHEN 10 LET m = "Oct"
+            WHEN 11 LET m = "Nov"
+            WHEN 12 LET m = "Dec"
+        END CASE
+        CALL wc_2darray.cell_set(x, 1, SFMT("%1 %2",DAY(d), m))
+        IF d = TODAY THEN
+            CALL wc_2darray.cell_class_set(x,1,"today")
+            CALL wc_2darray.cell_class_set(x,2,"today")
+            FOR y = 4 TO 8
+                CALL wc_2darray.cell_class_set(x,y,"today")
+            END FOR
+        ELSE
+            IF WEEKDAY(d) = 0 OR WEEKDAY(d) =6 THEN
+                CALL wc_2darray.cell_class_set(x,1,"weekend")
+                CALL wc_2darray.cell_class_set(x,2,"weekend")
+                FOR y = 4 TO 8
+                    IF y MOD 2 = 0 THEN
+                        CALL wc_2darray.cell_class_set(x,y,"weekend")
+                    ELSE
+                        CALL wc_2darray.cell_class_set(x,y,"weekend_alt")
+                    END IF
+                END FOR
+            ELSE
+                CALL wc_2darray.cell_class_set(x,1,"workday")
+                CALL wc_2darray.cell_class_set(x,2,"workday")
+                FOR y = 4 TO 8
+                    IF y MOD 2 = 0 THEN
+                        CALL wc_2darray.cell_class_set(x,y,"workday")
+                    ELSE
+                        CALL wc_2darray.cell_class_set(x,y,"workday_alt")
+                    END IF
+                END FOR
+            END IF
+        END IF
+    END FOR
+
+    -- Value Cell Classes
+    CALL wc_2darray.cell_class_set(2,1,"numeric value")
+    CALL wc_2darray.cell_width_set(2,3,2)
+    CALL wc_2darray.cell_class_set(2,3,"type")
+    CALL wc_2darray.cell_class_set(2,4,"numeric value")
+    CALL wc_2darray.cell_class_set(2,5,"numeric value")
+    CALL wc_2darray.cell_class_set(2,6,"numeric value")
+    CALL wc_2darray.cell_class_set(2,7,"numeric value")
+    CALL wc_2darray.cell_class_set(2,8,"numeric value")
+    CALL wc_2darray.cell_class_set(4,2,"numeric value")
+    CALL wc_2darray.cell_class_set(4,5,"numeric value")
+    CALL wc_2darray.cell_class_set(4,6,"numeric value")
+    CALL wc_2darray.cell_class_set(4,7,"numeric value")
+    CALL wc_2darray.cell_class_set(4,8,"numeric value")
+    CALL wc_2darray.cell_class_set(5,1,"numeric value")
+
+    CALL wc_2darray.cell_class_set(6,2,"milestone")
+    CALL wc_2darray.cell_class_set(6,4,"milestone numeric")
+    CALL wc_2darray.cell_class_set(6,5,"milestone numeric")
+    CALL wc_2darray.cell_class_set(6,6,"milestone numeric")
+    CALL wc_2darray.cell_class_set(6,7,"milestone numeric")
+    CALL wc_2darray.cell_class_set(6,8,"milestone")
+
+    CALL wc_2darray.cell_class_set(21,2,"today")
+    CALL wc_2darray.cell_class_set(21,4,"today numeric")
+    CALL wc_2darray.cell_class_set(21,5,"today numeric")
+    CALL wc_2darray.cell_class_set(21,6,"today numeric")
+    CALL wc_2darray.cell_class_set(21,7,"today numeric")
+    CALL wc_2darray.cell_class_set(21,8,"today numeric")
+
+  
+    -- Values
+    CALL wc_2darray.cell_set(2,1,0)
+    CALL wc_2darray.cell_set(2,3,"B-TestProduct")
+    CALL wc_2darray.cell_set(2,4,3002)
+    CALL wc_2darray.cell_set(2,5,0)
+    CALL wc_2darray.cell_set(2,6,0)
+    CALL wc_2darray.cell_set(2,7,0)
+    CALL wc_2darray.cell_set(2,8,0)
+    CALL wc_2darray.cell_set(4,2,0)
+    CALL wc_2darray.cell_set(4,5,0)
+    CALL wc_2darray.cell_set(4,6,0)
+    CALL wc_2darray.cell_set(4,7,0)
+    CALL wc_2darray.cell_set(4,8,0)
+    CALL wc_2darray.cell_set(5,1,0)
+    
+    CALL wc_2darray.cell_set(6,4,"$2000.00")
+    CALL wc_2darray.cell_set(6,8,"narr(M), dia")
+
+    CALL wc_2darray.cell_set(21,4,"$2000.00")
+
+    CALL wc_2darray.cell_set(24,4,"$2000.00")
+    CALL wc_2darray.cell_set(24,6,"$200.00")
+    CALL wc_2darray.cell_class_set(24,4,"installment value")
+    CALL wc_2darray.cell_class_set(24,5,"installment value")
+    CALL wc_2darray.cell_class_set(24,6,"installment value")
+    CALL wc_2darray.cell_class_set(24,7,"installment value")
+    CALL wc_2darray.cell_class_set(24,8,"installment")
+    
 END FUNCTION
 
 
@@ -303,7 +571,7 @@ DEFINE l_pld, l_pts, l_gd INTEGER
 
     CALL wc_2darray.cell_set(1,2,"2")
     CALL wc_2darray.cell_set(2,2,"Arsenal")
-    CALL wc_2darray.cell_style_set(2,2,"background-color: red; color: white")
+    CALL wc_2darray.cell_style_set(2,2,"background: repeating-linear-gradient(to right, white, white 10%,red 10%,red 90%, white 90%, white 100%); color: white")
     CALL wc_2darray.cell_set(4,2,"20")
     CALL wc_2darray.cell_set(5,2,"11")
     CALL wc_2darray.cell_set(6,2,"7")
@@ -348,7 +616,7 @@ DEFINE l_pld, l_pts, l_gd INTEGER
 
     CALL wc_2darray.cell_set(1,7,"7")
     CALL wc_2darray.cell_set(2,7,"West Ham United ")
-    CALL wc_2darray.cell_style_set(2,7,"background-color: #710022; color: #6CAEFF")
+    CALL wc_2darray.cell_style_set(2,7,"background: repeating-linear-gradient(to right, #6CAEFF, #6CAEFF 10%,#710022 10%,#710022 90%, #6CAEFF 90%, #6CAEFF 100%); color: #6CAEFF")
     CALL wc_2darray.cell_set(4,7,"16")
     CALL wc_2darray.cell_set(5,7,"14")
     CALL wc_2darray.cell_set(6,7,"8")
@@ -457,6 +725,7 @@ DEFINE l_pld, l_pts, l_gd INTEGER
     CALL wc_2darray.cell_set(1,19,"19")
     CALL wc_2darray.cell_set(2,19,"Norwich")
     CALL wc_2darray.cell_style_set(2,19,"background-color: yellow; color: green")
+    #CALL wc_2darray.cell_style_set(2,19,"background: repeating-linear-gradient(to right, green, green 10px,yellow 10px,yellow 20px),repeating-linear-gradient(to bottom, green, green 10px,yellow 10px,yellow 20px); color: white")
     CALL wc_2darray.cell_set(4,19,"9")
     CALL wc_2darray.cell_set(5,19,"7")
     CALL wc_2darray.cell_set(6,19,"22")
@@ -465,7 +734,7 @@ DEFINE l_pld, l_pts, l_gd INTEGER
 
     CALL wc_2darray.cell_set(1,20,"20")
     CALL wc_2darray.cell_set(2,20,"Aston Villa")
-    CALL wc_2darray.cell_style_set(2,20,"background-color: #710022; color: #6CAEFF")
+    CALL wc_2darray.cell_style_set(2,20,"background: repeating-linear-gradient(to right, #6CAEFF, #6CAEFF 10%,#710022 10%,#710022 90%, #6CAEFF 90%, #6CAEFF 100%); color: #6CAEFF")
     CALL wc_2darray.cell_set(4,20,"3")
     CALL wc_2darray.cell_set(5,20,"8")
     CALL wc_2darray.cell_set(6,20,"27")
@@ -515,3 +784,64 @@ DEFINE l_pld, l_pts, l_gd INTEGER
 
 END FUNCTION
 
+FUNCTION populate_multiple_aggregate()
+DEFINE i INTEGER
+DEFINE qty, price, line_total, total DECIMAL(11,2)
+
+    CALL wc_2darray.init()
+
+    CALL wc_2darray.style_append(".numeric","text-align","right")
+    CALL wc_2darray.style_append(".right","text-align","right")
+    CALL wc_2darray.style_append(".merged","text-align","center")
+    CALL wc_2darray.style_append(".heading","font-weight","bold")
+    CALL wc_2darray.style_append(".total","font-weight","bold")
+
+    -- Define column headers
+    CALL wc_2darray.col_set(1,"Code")
+    CALL wc_2darray.col_set(2,"Description")
+    CALL wc_2darray.col_set(3,"Quantity")
+    CALL wc_2darray.col_set(4,"Price")
+    CALL wc_2darray.col_set(5,"Value")
+   
+
+    FOR i = 1 TO 13
+        CALL wc_2darray.row_set(i,"")
+    END FOR
+    
+    LET total = 0
+    FOR i = 1 TO 10
+        CALL wc_2darray.cell_set(1,i,"X")
+        CALL wc_2darray.cell_set(2,i,"XXXXX")
+        LET price = util.Math.rand(10000)/100
+        LET qty = util.math.rand(100)
+        LET line_total = price* qty
+        LET total = total + line_total 
+        CALL wc_2darray.cell_set(3,i,price USING "$$$,$$&.&&")
+        CALL wc_2darray.cell_set(4,i,qty USING "##&.&&")
+        CALL wc_2darray.cell_set(5,i, line_total USING "$$$,$$$,$$&.&&")
+
+        CALL wc_2darray.cell_class_set(3,i,"numeric")
+        CALL wc_2darray.cell_class_set(4,i,"numeric")
+        CALL wc_2darray.cell_class_set(5,i,"numeric")
+    END FOR
+    CALL wc_2darray.cell_set(5,11, total USING "$$$,$$$,$$&.&&")
+    CALL wc_2darray.cell_set(5,12, (0.15*total) USING "$$$,$$$,$$&.&&")
+    CALL wc_2darray.cell_set(5,13, (1.15*total USING "$$$,$$$,$$&.&&"))
+    CALL wc_2darray.cell_class_set(5,11,"numeric total")
+    CALL wc_2darray.cell_class_set(5,12,"numeric total")
+    CALL wc_2darray.cell_class_set(5,13,"numeric total")
+
+    CALL wc_2darray.cell_width_set(1,11,4)
+    CALL wc_2darray.cell_class_set(1,11,"right total")
+    CALL wc_2darray.cell_set(1,11,"Nett Total")
+    
+    CALL wc_2darray.cell_width_set(1,12,4)
+    CALL wc_2darray.cell_class_set(1,12,"right total")
+    CALL wc_2darray.cell_set(1,12,"Tax (15%)")
+    
+    CALL wc_2darray.cell_width_set(1,13,4)
+    CALL wc_2darray.cell_class_set(1,13,"right total")
+    CALL wc_2darray.cell_set(1,13,"Gross Total")
+        
+
+END FUNCTION
