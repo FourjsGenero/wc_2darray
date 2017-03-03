@@ -3,9 +3,12 @@ IMPORT util
 
 MAIN
 DEFINE twodarray STRING
-DEFINE l_result STRING
 
-    OPEN WINDOW w WITH FORM "wc_2darray_test.per"
+    OPTIONS FIELD ORDER FORM
+    OPTIONS INPUT WRAP
+    
+    CLOSE WINDOW SCREEN
+    OPEN WINDOW w WITH FORM "wc_2darray_test"
     WHILE TRUE
         MENU "2d Array Test"  
             ON ACTION timestable ATTRIBUTES(TEXT="Times Table")
@@ -49,6 +52,8 @@ DEFINE l_result STRING
         
     END WHILE
 END MAIN
+
+
 
 FUNCTION populate_timestable()
 DEFINE x,y INTEGER
@@ -806,7 +811,10 @@ DEFINE qty, price, line_total, total DECIMAL(11,2)
     CALL wc_2darray.col_set(3,"Quantity")
     CALL wc_2darray.col_set(4,"Price")
     CALL wc_2darray.col_set(5,"Value")
-   
+
+    CALL wc_2darray.col_class_set(3,"right")
+    CALL wc_2darray.col_class_set(4,"right")
+    CALL wc_2darray.col_class_set(5,"right")
 
     FOR i = 1 TO 13
         CALL wc_2darray.row_set(i,"")
