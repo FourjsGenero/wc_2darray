@@ -25,7 +25,12 @@
             // document
             setById = function(id, value) {
                 document.getElementById(id).innerHTML=value;
-            }
+            };
+              // Called by webcompnent frontcall to alter the HTML of the
+            // document
+            setAttributeById = function(id, att, value) {
+                document.getElementById(id)[att]=value;
+            };
 
          
             // When the user click on the document we ask the DVM to

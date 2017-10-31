@@ -772,7 +772,7 @@ DEFINE l_pld, l_pts, l_gd INTEGER
         CALL wc_2darray.cell_style_set(9,i,"width:3ex; text-align: right")
         CALL wc_2darray.cell_style_set(10,i,"width:3ex; text-align: right")
 
-        CALL wc_2darray.cell_style_append(2,i,"width:22ex; text-align: center; font-weight: bold")
+        CALL wc_2darray.cell_style_append(2,i,"width:44ex; text-align: center; font-weight: bold")
         CALL wc_2darray.cell_style_set(11,i,"width:30ex;")
     END FOR
 

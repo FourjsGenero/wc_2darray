@@ -260,8 +260,8 @@ FUNCTION html_send(fieldname)
 DEFINE fieldname STRING
 DEFINE l_result STRING
 
-    CALL ui.interface.frontcall("webcomponent","call",[fieldname,"setById","root",generate_html()],l_result)
-    CALL ui.Interface.frontCall("webcomponent","call",[fieldname,"setById","udf", generate_css()], l_result)
+    CALL ui.interface.frontcall("webcomponent","call",[fieldname,"setAttributeById","root", "innerHTML",generate_html()],l_result)
+    CALL ui.Interface.frontCall("webcomponent","call",[fieldname,"setAttributeById","udf", "innerHTML",generate_css()], l_result)
 END FUNCTION
     
 
