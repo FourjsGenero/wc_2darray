@@ -20,8 +20,11 @@ DEFINE twodarray STRING
             ON ACTION coloursize2 ATTRIBUTES(TEXT="Colour Size 2")
                 CALL populate_coloursize2()
                 EXIT MENU
-            ON ACTION calendar ATTRIBUTES(TEXT="Calendar")
-                CALL populate_calendar()
+            ON ACTION calendar_simple ATTRIBUTES(TEXT="Calendar Simple")
+                CALL populate_calendar_simple()
+                EXIT MENU
+            ON ACTION calendar_complex ATTRIBUTES(TEXT="Calendar Complex")
+                CALL populate_calendar_complex()
                 EXIT MENU
             ON ACTION timeline ATTRIBUTES(TEXT="Timeline")
                 CALL populate_timeline()
@@ -56,29 +59,32 @@ END MAIN
 
 
 FUNCTION populate_timestable()
-DEFINE x,y INTEGER
+DEFINE columns, rows INTEGER
+DEFINE col, row INTEGER
 
+    PROMPT "Enter number of columns" FOR columns
+    PROMPT "Enter number of rows" FOR rows
 
     CALL wc_2darray.init()
 
     CALL wc_2darray.style_append(".numeric","text-align","right");
 
     -- Define column headers
-    FOR x = 1 TO 10
-        CALL wc_2darray.col_set(x,x)
-        CALL wc_2darray.col_class_set(x,"numeric")
-        CALL wc_2darray.col_style_set(x,"width:40px")
+    FOR col = 1 TO columns
+        CALL wc_2darray.col_set(col,col)
+        CALL wc_2darray.col_class_set(col,"numeric")
+        CALL wc_2darray.col_style_set(col,"width:40px")
     END FOR
     -- Define row headers
-    FOR y = 1 TO 10
-        CALL wc_2darray.row_set(y,y)
-        CALL wc_2darray.row_class_set(y,"numeric")
+    FOR row = 1 TO rows
+        CALL wc_2darray.row_set(row,row)
+        CALL wc_2darray.row_class_set(row,"numeric")
     END FOR
     -- Define individual cells
-    FOR x = 1 TO 10
-        FOR y = 1 TO 10
-            CALL wc_2darray.cell_set(x,y,x*y)
-            CALL wc_2darray.cell_class_set(x,y,"numeric")
+    FOR col = 1 TO columns
+        FOR row = 1 TO rows
+            CALL wc_2darray.cell_set(col,row,col*row)
+            CALL wc_2darray.cell_class_set(col,row,"numeric")
         END FOR
     END FOR
 END FUNCTION
@@ -174,7 +180,7 @@ DEFINE x, y INTEGER
     END FOR
 END FUNCTION
 
-FUNCTION populate_calendar()
+FUNCTION populate_calendar_simple()
 DEFINE x,y INTEGER
 
     CALL wc_2darray.init()
@@ -205,9 +211,9 @@ DEFINE x,y INTEGER
     CALL wc_2darray.cell_set(4,5,"ALL DAY Accurate College Photographic Society Expedition")
     CALL wc_2darray.cell_set(5,5,"All Day-17:00 Accurate College Photographic Society Expedition")
 
-    -- Would probably add more methods to set cell contents rather than so much raw html
-    CALL wc_2darray.cell_set(2,3,'<table><tr><td colspan="2">7 Bookings 09:00 - 21:30</td></tr><tr><td>09:00 - 10:30</td><td>Engineering Tutor Meeting</td></tr><tr><td>11:00 - 12:15</td><td>Finance Department</td></tr><tr><td>12:30 - 13:30</td><td>Tutorial Offce Meeting</td></tr><tr><td>14:00 - 15:00</td><td>Finance: Accurate Solutions Demonstration</td></tr><tr><td>15:00 - 16:00</td><td>Finance Department post demo review</td></tr><tr><td>16:00 - 17:00</td><td>Porters Training Session/td></tr><tr><td>18:00 - 21:30</td><td>Chess Club</td></tr></table>')
-    CALL wc_2darray.cell_set(2,4,'<table><tr><td colspan="2">2 Bookings 00:00 - 22:00</td></tr><tr><td>Until 17:30</td><td>Jeffs Shephers Pie Eating Seminar</td></tr><tr><td>18:30 - 22:00</td><td>SCR Whiskey Tasking</td></tr></table>')
+    -- TODOWould probably add more methods to set cell contents rather than so much raw html
+    #CALL wc_2darray.cell_set(2,3,'<table><tr><td colspan="2">7 Bookings 09:00 - 21:30</td></tr><tr><td>09:00 - 10:30</td><td>Engineering Tutor Meeting</td></tr><tr><td>11:00 - 12:15</td><td>Finance Department</td></tr><tr><td>12:30 - 13:30</td><td>Tutorial Offce Meeting</td></tr><tr><td>14:00 - 15:00</td><td>Finance: Accurate Solutions Demonstration</td></tr><tr><td>15:00 - 16:00</td><td>Finance Department post demo review</td></tr><tr><td>16:00 - 17:00</td><td>Porters Training Session/td></tr><tr><td>18:00 - 21:30</td><td>Chess Club</td></tr></table>')
+    #CALL wc_2darray.cell_set(2,4,'<table><tr><td colspan="2">2 Bookings 00:00 - 22:00</td></tr><tr><td>Until 17:30</td><td>Jeffs Shephers Pie Eating Seminar</td></tr><tr><td>18:30 - 22:00</td><td>SCR Whiskey Tasking</td></tr></table>')
 
     FOR y = 1 TO 6 STEP 2
         CALL wc_2darray.row_style_set(y,"background-color: #FFFFCE")
@@ -216,6 +222,42 @@ DEFINE x,y INTEGER
         END FOR
     END FOR
 END FUNCTION
+
+
+
+FUNCTION populate_calendar_complex()
+DEFINE col, row INTEGER
+
+    CALL wc_2darray.init()
+    FOR col = 1 TO 7
+        CALL wc_2darray.col_set(col, TODAY+col-4)
+        CALL wc_2darray.col_style_set(col,"width: 20em")
+    END FOR
+    FOR row = 1 TO 32
+        CALL wc_2darray.row_set(row,  SFMT("%1:%2", (9 + ((row-3)/4)) USING "&&", ((row-1) MOD 4 * 15) USING "&&"))
+    END FOR
+
+    CALL wc_2darray.style_append(".tentative","background-color","#FFFFE0")
+    CALL wc_2darray.style_append(".busy","background-color","#FFC0CB")
+
+    -- Define columns 
+    CALL wc_2darray.cell_set(4,10,"Doctors Appointment")
+    CALL wc_2darray.cell_class_set(4,10,"busy")
+    CALL wc_2darray.cell_height_set(4,10,2)
+
+    CALL wc_2darray.cell_set(2,20,"Accountant")
+    CALL wc_2darray.cell_class_set(2,20,"tentative")
+    CALL wc_2darray.cell_height_set(2,20,4)
+    CALL wc_2darray.cell_set(5,20,"Accountant")
+    CALL wc_2darray.cell_class_set(5,20,"tentative")
+    CALL wc_2darray.cell_height_set(5,20,4)
+
+END FUNCTION
+
+    
+
+
+
 
 
 FUNCTION populate_timeline()
